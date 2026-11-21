@@ -9,9 +9,15 @@
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, mkdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 mkdirSync(out, { recursive: true });
-copyFileSync(new URL('./entry.png', import.meta.url), join(out, 'entry.png'));
+const src = new URL('./entry.png', import.meta.url);
+const dest = join(out, 'entry.png');
+copyFileSync(src, dest);
+
+// The judge sees exactly these bytes, so say what was written: the front page is
+// 1024x1024 and must stay under the 1 MiB gate.
+console.log(`entry.png written to ${dest} (${statSync(dest).size} bytes)`);
